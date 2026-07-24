@@ -1,0 +1,6 @@
+FROM node:18-alpine
+WORKDIR /app
+COPY apps/backend/package.json ./
+RUN npm install --omit=dev
+COPY apps/backend ./
+CMD ["npm", "run", "start"]

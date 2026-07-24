@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  @apply bg-slate-50 text-slate-900;
+  font-family: theme('fontFamily.body');
+  background-color: theme('colors.pitch.DEFAULT');
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(47, 143, 91, 0.12), transparent),
+    repeating-linear-gradient(
+      90deg,
+      rgba(241, 243, 240, 0.015) 0px,
+      rgba(241, 243, 240, 0.015) 1px,
+      transparent 1px,
+      transparent 96px
+    );
+  color: #f1f3f0;
+}
+
+::selection {
+  background-color: theme('colors.floodlight');
+  color: theme('colors.pitch.DEFAULT');
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

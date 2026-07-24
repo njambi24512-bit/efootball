@@ -17,14 +17,14 @@ export default function VerificationUploader({
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 p-4">
-      <p className="text-sm text-slate-600">Verification code</p>
-      <p className="text-lg font-semibold">{verificationCode}</p>
-      <input type="file" onChange={(event) => setFile(event.target.files?.[0] || null)} className="mt-3" />
+    <div className="rounded-lg border border-pitch-lighter bg-pitch p-4">
+      <p className="text-sm text-slate-card">Verification code</p>
+      <p className="text-lg font-semibold text-chalk">{verificationCode}</p>
+      <input type="file" onChange={(event) => setFile(event.target.files?.[0] || null)} className="mt-3 block w-full text-sm text-slate-card" />
       <button
         onClick={uploadProof}
         disabled={!file || uploading}
-        className="mt-3 rounded bg-green-600 px-4 py-2 text-white disabled:cursor-not-allowed disabled:bg-green-300"
+        className="mt-3 rounded bg-turf px-4 py-2 font-semibold text-chalk disabled:cursor-not-allowed disabled:bg-turf/60"
       >
         {uploading ? 'Uploading...' : 'Upload proof'}
       </button>
