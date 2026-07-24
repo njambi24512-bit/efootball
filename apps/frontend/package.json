@@ -1,0 +1,25 @@
+{
+  "name": "efootball-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "echo 'No lint configured yet'"
+  },
+  "dependencies": {
+    "next": "13.5.6",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "socket.io-client": "^4.7.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "10.4.14",
+    "postcss": "8.4.24",
+    "tailwindcss": "3.4.17",
+    "typescript": "5.2.2"
+  }
+}
