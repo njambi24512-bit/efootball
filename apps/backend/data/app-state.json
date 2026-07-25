@@ -16,5 +16,14 @@
   "listings": [],
   "newsItems": [],
   "tournaments": [],
-  "chatMessages": []
+  "chatMessages": [
+    {
+      "id": "wtCNiM6Z_bGcuXtpAAAB-1784984331327",
+      "room": "global",
+      "userId": "wtCNiM6Z_bGcuXtpAAAB",
+      "username": "tester",
+      "text": "Hello from test script 1784984331320",
+      "createdAt": "2026-07-25T12:58:51.327Z"
+    }
+  ]
 }
