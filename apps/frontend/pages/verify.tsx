@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import VerificationUploader from '../components/VerificationUploader';
+import { API_BASE_URL } from '../lib/api';
 
 export default function VerifyPage() {
   const [token, setToken] = useState('');
@@ -22,7 +23,7 @@ export default function VerifyPage() {
 
   async function auth() {
     const endpoint = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
-    const response = await fetch('http://localhost:4000' + endpoint, {
+    const response = await fetch(API_BASE_URL + endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mode === 'register' ? { username, email, password, platform, region } : { email, password })
@@ -41,7 +42,7 @@ export default function VerifyPage() {
   }
 
   async function startVerification() {
-    const response = await fetch('http://localhost:4000/api/konami/start', {
+    const response = await fetch(`${API_BASE_URL}/api/konami/start`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ konami_id: konamiId, platform })

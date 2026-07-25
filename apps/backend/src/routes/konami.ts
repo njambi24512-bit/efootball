@@ -5,7 +5,7 @@ import { createVerification, findUserById, findVerificationById, updateVerificat
 
 const router = Router();
 
-function getAuthenticatedUser(req: any) {
+async function getAuthenticatedUser(req: any) {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
   if (!token) {
@@ -14,14 +14,14 @@ function getAuthenticatedUser(req: any) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as { sub?: string };
-    return findUserById(payload.sub || '');
+    return await findUserById(payload.sub || '');
   } catch {
     return null;
   }
 }
 
-router.post('/start', (req, res) => {
-  const user = getAuthenticatedUser(req);
+router.post('/start', async (req, res) => {
+  const user = await getAuthenticatedUser(req);
   if (!user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -41,7 +41,7 @@ router.post('/start', (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  createVerification(verification);
+  await createVerification(verification);
 
   return res.json({
     success: true,
@@ -54,8 +54,8 @@ router.post('/start', (req, res) => {
   });
 });
 
-router.post('/submit-proof', (req, res) => {
-  const user = getAuthenticatedUser(req);
+router.post('/submit-proof', async (req, res) => {
+  const user = await getAuthenticatedUser(req);
   if (!user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -65,12 +65,12 @@ router.post('/submit-proof', (req, res) => {
     return res.status(400).json({ error: 'verification_id and proof_url are required' });
   }
 
-  const verification = findVerificationById(verification_id);
+  const verification = await findVerificationById(verification_id);
   if (!verification || verification.userId !== user.id) {
     return res.status(404).json({ error: 'Verification not found' });
   }
 
-  updateVerification(verification_id, { proofUrl: proof_url, status: 'pending' });
+  await updateVerification(verification_id, { proofUrl: proof_url, status: 'pending' });
 
   return res.json({ success: true, message: 'Proof submitted for review' });
 });

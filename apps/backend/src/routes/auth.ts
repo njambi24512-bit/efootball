@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { createUser, findUserByEmail, findUserById } from '../services/stateStore';
+import { createUser, findUserByEmail, findUserById, updateUser } from '../services/stateStore';
 
 const router = Router();
 
@@ -13,7 +13,7 @@ function createToken(userId: string) {
   return jwt.sign({ sub: userId }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
 }
 
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const { username, email, password, platform, region } = req.body as {
     username?: string;
     email?: string;
@@ -26,7 +26,7 @@ router.post('/register', (req, res) => {
     return res.status(400).json({ error: 'username, email, password, platform, and region are required' });
   }
 
-  if (findUserByEmail(email)) {
+  if (await findUserByEmail(email)) {
     return res.status(409).json({ error: 'User already exists' });
   }
 
@@ -42,19 +42,27 @@ router.post('/register', (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  createUser(user);
+  try {
+    await createUser(user);
+  } catch (error: any) {
+    if (error?.code === '23505') {
+      return res.status(409).json({ error: 'User already exists' });
+    }
+
+    throw error;
+  }
 
   const token = createToken(user.id);
   return res.status(201).json({ user, token });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body as { email?: string; password?: string };
   if (!email || !password) {
     return res.status(400).json({ error: 'email and password are required' });
   }
 
-  const user = findUserByEmail(email);
+  const user = await findUserByEmail(email);
   if (!user || user.passwordHash !== hashPassword(password)) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
@@ -63,7 +71,7 @@ router.post('/login', (req, res) => {
   return res.json({ user, token });
 });
 
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
 
@@ -73,7 +81,7 @@ router.get('/me', (req, res) => {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as { sub?: string };
-    const user = findUserById(payload.sub || '');
+    const user = await findUserById(payload.sub || '');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -84,7 +92,7 @@ router.get('/me', (req, res) => {
   }
 });
 
-router.put('/profile', (req, res) => {
+router.put('/profile', async (req, res) => {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
 
@@ -94,17 +102,15 @@ router.put('/profile', (req, res) => {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as { sub?: string };
-    const user = findUserById(payload.sub || '');
+    const user = await findUserById(payload.sub || '');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     const { username, platform, region } = req.body as { username?: string; platform?: string; region?: string };
-    if (username) user.username = username;
-    if (platform) user.platform = platform;
-    if (region) user.region = region;
+    const updatedUser = await updateUser(user.id, { username, platform, region });
 
-    return res.json({ user });
+    return res.json({ user: updatedUser });
   } catch {
     return res.status(401).json({ error: 'Invalid token' });
   }

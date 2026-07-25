@@ -10,3 +10,24 @@ services:
     image: redis:7
     ports:
       - '6379:6379'
+  loadtest:
+    image: grafana/k6:0.55.2
+    profiles:
+      - loadtest
+    depends_on:
+      - db
+      - redis
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    working_dir: /scripts
+    volumes:
+      - ../scripts/loadtest:/scripts:ro
+    environment:
+      API_BASE_URL: ${API_BASE_URL:-http://host.docker.internal:4000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://host.docker.internal:3000}
+      TARGET_USERS: ${TARGET_USERS:-200}
+      RAMP_UP_DURATION: ${RAMP_UP_DURATION:-1m}
+      HOLD_DURATION: ${HOLD_DURATION:-3m}
+      RAMP_DOWN_DURATION: ${RAMP_DOWN_DURATION:-1m}
+    entrypoint: ["k6"]
+    command: ["run", "/scripts/efootball-api-loadtest.mjs"]

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../lib/api';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
@@ -10,7 +11,7 @@ export default function ProfilePage() {
       const storedToken = window.localStorage.getItem('efootball-token') || '';
       setToken(storedToken);
       if (storedToken) {
-        fetch('http://localhost:4000/api/auth/me', { headers: { Authorization: `Bearer ${storedToken}` } })
+        fetch(`${API_BASE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${storedToken}` } })
           .then((response) => response.json())
           .then((data) => setUser(data.user));
       }
@@ -18,7 +19,7 @@ export default function ProfilePage() {
   }, []);
 
   async function saveProfile() {
-    const response = await fetch('http://localhost:4000/api/auth/profile', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ username: user.username, platform: user.platform, region: user.region })

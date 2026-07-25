@@ -9,7 +9,7 @@ export function initSockets(io: SocketIOServer) {
       socket.join(room);
     });
 
-    socket.on('chat:message', (payload: { room?: string; user?: string; text?: string }) => {
+    socket.on('chat:message', async (payload: { room?: string; user?: string; text?: string }) => {
       if (!payload.room || !payload.text) {
         return;
       }
@@ -23,7 +23,7 @@ export function initSockets(io: SocketIOServer) {
         createdAt: new Date().toISOString()
       };
 
-      createChatMessage(message);
+      await createChatMessage(message);
       io.to(payload.room).emit('chat:message', message);
     });
   });

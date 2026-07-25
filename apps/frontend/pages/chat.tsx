@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { API_BASE_URL } from '../lib/api';
 
 export default function ChatPage() {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -8,7 +9,7 @@ export default function ChatPage() {
   const [username, setUsername] = useState('guest');
 
   useEffect(() => {
-    const client = io('http://localhost:4000');
+    const client = io(API_BASE_URL);
     setSocket(client);
 
     client.emit('join', 'global');
@@ -16,7 +17,7 @@ export default function ChatPage() {
       setMessages((current) => [...current, { username: message.username, text: message.text }]);
     });
 
-    fetch('http://localhost:4000/api/chat/messages?room=global')
+    fetch(`${API_BASE_URL}/api/chat/messages?room=global`)
       .then((response) => response.json())
       .then((data) => setMessages(data.messages.map((message: any) => ({ username: message.username, text: message.text }))));
 

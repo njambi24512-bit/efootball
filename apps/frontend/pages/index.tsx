@@ -2,14 +2,15 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { MessageSquare, Newspaper, ShieldCheck, ShoppingBag, Trophy } from 'lucide-react';
 import SquadCard from '../components/SquadCard';
+import { API_BASE_URL } from '../lib/api';
 
 export default function Home() {
   const [news, setNews] = useState<any[]>([]);
   const [tournaments, setTournaments] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/news').then((response) => response.json()).then((data) => setNews(data.items));
-    fetch('http://localhost:4000/api/tournaments').then((response) => response.json()).then((data) => setTournaments(data.tournaments));
+    fetch(`${API_BASE_URL}/api/news`).then((response) => response.json()).then((data) => setNews(data.items));
+    fetch(`${API_BASE_URL}/api/tournaments`).then((response) => response.json()).then((data) => setTournaments(data.tournaments));
   }, []);
 
   return (
@@ -71,7 +72,7 @@ export default function Home() {
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {news.slice(0, 3).map((item) => (
-            <SquadCard key={item.id} accent="slate" eyebrow={item.category || 'News'} stat={<Newspaper size={16} />} title={item.title} footer={item.source || 'Konami'}>
+            <SquadCard key={item.id} accent="slate" eyebrow={item.category || 'News'} stat={<Newspaper size={16} />} title={item.title} footer={item.sourceUrl || 'Konami'}>
               {item.summary}
             </SquadCard>
           ))}

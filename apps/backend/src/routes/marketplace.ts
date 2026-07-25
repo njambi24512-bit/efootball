@@ -5,7 +5,7 @@ import { createListing, findUserById, listListings } from '../services/stateStor
 
 const router = Router();
 
-function getAuthenticatedUser(req: any) {
+async function getAuthenticatedUser(req: any) {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
   if (!token) {
@@ -14,18 +14,18 @@ function getAuthenticatedUser(req: any) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as { sub?: string };
-    return findUserById(payload.sub || '');
+    return await findUserById(payload.sub || '');
   } catch {
     return null;
   }
 }
 
-router.get('/listings', (_req, res) => {
-  res.json({ items: listListings() });
+router.get('/listings', async (_req, res) => {
+  res.json({ items: await listListings() });
 });
 
-router.post('/listings', (req, res) => {
-  const user = getAuthenticatedUser(req);
+router.post('/listings', async (req, res) => {
+  const user = await getAuthenticatedUser(req);
   if (!user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -52,7 +52,7 @@ router.post('/listings', (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  createListing(listing);
+  await createListing(listing);
   return res.status(201).json({ listing, warning: 'Trading may violate Konami terms of service.' });
 });
 

@@ -1,6 +1,7 @@
 {
   "typescript.tsdk": "./node_modules/typescript/lib",
   "css.validate": false,
+  "css.lint.unknownAtRules": "ignore",
   "tailwindCSS.files.include": ["**/*.{css,ts,tsx,js,jsx}"],
   "tailwindCSS.includeLanguages": {
     "typescript": "javascript",

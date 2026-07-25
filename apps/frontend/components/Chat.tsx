@@ -1,27 +1,31 @@
 import { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
+import { API_BASE_URL } from '../lib/api';
 
 export default function Chat() {
-  const [messages, setMessages] = useState<Array<{ user: string; text: string }>>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [messages, setMessages] = useState<Array<{ username: string; text: string }>>([]);
   const [value, setValue] = useState('');
 
   useEffect(() => {
-    const socket = io('http://localhost:4000');
-    socket.emit('join', 'global');
-    socket.on('chat:message', (message) => {
+    const client = io(API_BASE_URL);
+    setSocket(client);
+
+    client.emit('join', 'global');
+    client.on('chat:message', (message) => {
       setMessages((current) => [...current, message]);
     });
 
     return () => {
-      socket.disconnect();
+      client.disconnect();
     };
   }, []);
 
   function sendMessage() {
-    const socket = io('http://localhost:4000');
+    if (!socket) return;
+
     socket.emit('chat:message', { room: 'global', user: 'you', text: value });
     setValue('');
-    socket.disconnect();
   }
 
   return (
@@ -29,8 +33,8 @@ export default function Chat() {
       <h2 className="font-medium">Global chat</h2>
       <div className="mt-3 space-y-2">
         {messages.map((message, index) => (
-          <div key={`${message.user}-${index}`} className="rounded bg-slate-100 p-2 text-sm">
-            <strong>{message.user}</strong>: {message.text}
+          <div key={`${message.username}-${index}`} className="rounded bg-slate-100 p-2 text-sm">
+            <strong>{message.username}</strong>: {message.text}
           </div>
         ))}
       </div>

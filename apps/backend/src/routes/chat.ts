@@ -5,7 +5,7 @@ import { createChatMessage, findUserById, listChatMessages } from '../services/s
 
 const router = Router();
 
-function getAuthenticatedUser(req: any) {
+async function getAuthenticatedUser(req: any) {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
   if (!token) {
@@ -14,19 +14,19 @@ function getAuthenticatedUser(req: any) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as { sub?: string };
-    return findUserById(payload.sub || '');
+    return await findUserById(payload.sub || '');
   } catch {
     return null;
   }
 }
 
-router.get('/messages', (req, res) => {
+router.get('/messages', async (req, res) => {
   const room = req.query.room as string | undefined;
-  res.json({ messages: listChatMessages(room) });
+  res.json({ messages: await listChatMessages(room) });
 });
 
-router.post('/messages', (req, res) => {
-  const user = getAuthenticatedUser(req);
+router.post('/messages', async (req, res) => {
+  const user = await getAuthenticatedUser(req);
   if (!user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -45,7 +45,7 @@ router.post('/messages', (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  createChatMessage(message);
+  await createChatMessage(message);
   return res.status(201).json({ message });
 });
 

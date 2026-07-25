@@ -5,7 +5,7 @@ import { createNewsItem, findUserById, listNewsItems } from '../services/stateSt
 
 const router = Router();
 
-function getAuthenticatedUser(req: any) {
+async function getAuthenticatedUser(req: any) {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
   if (!token) {
@@ -14,18 +14,18 @@ function getAuthenticatedUser(req: any) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as { sub?: string };
-    return findUserById(payload.sub || '');
+    return await findUserById(payload.sub || '');
   } catch {
     return null;
   }
 }
 
-router.get('/', (_req, res) => {
-  res.json({ items: listNewsItems() });
+router.get('/', async (_req, res) => {
+  res.json({ items: await listNewsItems() });
 });
 
-router.post('/', (req, res) => {
-  const user = getAuthenticatedUser(req);
+router.post('/', async (req, res) => {
+  const user = await getAuthenticatedUser(req);
   if (!user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -51,7 +51,7 @@ router.post('/', (req, res) => {
     publishedAt: new Date().toISOString()
   };
 
-  createNewsItem(item);
+  await createNewsItem(item);
   return res.status(201).json({ item });
 });
 
