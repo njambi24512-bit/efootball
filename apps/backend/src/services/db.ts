@@ -74,8 +74,20 @@ export async function initDb() {
       start_date text NOT NULL,
       created_by text NOT NULL,
       status text NOT NULL,
-      created_at text NOT NULL
+      created_at text NOT NULL,
+      updated_at text NOT NULL
     )
+  `);
+
+  await pool.query(`
+    ALTER TABLE tournaments
+    ADD COLUMN IF NOT EXISTS updated_at text
+  `);
+
+  await pool.query(`
+    UPDATE tournaments
+    SET updated_at = created_at
+    WHERE updated_at IS NULL
   `);
 
   await pool.query(`
@@ -85,6 +97,19 @@ export async function initDb() {
       user_id text NOT NULL,
       username text NOT NULL,
       text text NOT NULL,
+      attachments jsonb DEFAULT '[]',
+      edited_at text,
+      deleted boolean NOT NULL DEFAULT false,
+      created_at text NOT NULL
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS chat_reactions (
+      id text PRIMARY KEY,
+      message_id text NOT NULL,
+      user_id text NOT NULL,
+      emoji text NOT NULL,
       created_at text NOT NULL
     )
   `);

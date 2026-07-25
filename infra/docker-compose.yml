@@ -10,6 +10,33 @@ services:
     image: redis:7
     ports:
       - '6379:6379'
+  backend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgres://postgres:postgres@db:5432/efootball
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: changeme
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      - db
+      - redis
+    ports:
+      - '4000:4000'
+  frontend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.frontend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ''
+      API_PROXY_TARGET: http://backend:4000
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      - backend
+    ports:
+      - '3000:3000'
   loadtest:
     image: grafana/k6:0.55.2
     profiles:
@@ -17,6 +44,8 @@ services:
     depends_on:
       - db
       - redis
+      - backend
+      - frontend
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     working_dir: /scripts

@@ -61,5 +61,33 @@ describe('platform features', () => {
 
     expect(tournamentsResponse.status).toBe(201);
     expect(tournamentsResponse.body.tournament.name).toBe('Weekend Cup');
+
+    const metricsResponse = await request(app).get('/api/tournaments/metrics');
+
+    expect(metricsResponse.status).toBe(200);
+    expect(metricsResponse.body.metrics.total).toBeGreaterThanOrEqual(1);
+
+    const tournamentId = tournamentsResponse.body.tournament.id;
+
+    const detailsResponse = await request(app).get(`/api/tournaments/${tournamentId}`);
+
+    expect(detailsResponse.status).toBe(200);
+    expect(detailsResponse.body.tournament.id).toBe(tournamentId);
+
+    const updateResponse = await request(app)
+      .patch(`/api/tournaments/${tournamentId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Weekend Cup Updated',
+        format: 'double-elimination',
+        max_participants: 32,
+        start_date: '2026-08-02',
+        status: 'open'
+      });
+
+    expect(updateResponse.status).toBe(200);
+    expect(updateResponse.body.tournament.name).toBe('Weekend Cup Updated');
+    expect(updateResponse.body.tournament.status).toBe('open');
+    expect(updateResponse.body.tournament.updatedAt).toBeDefined();
   });
 });
