@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "id": "7d0999e1-9365-424e-8e13-2bd9e97331e1",
+      "username": "alex",
+      "email": "alex@gmail.com",
+      "passwordHash": "ac63227f09590a0c4383daa7c0008cf9e15f9ca219e02bdb92523b9693ec3c30",
+      "platform": "ps",
+      "region": "eu",
+      "role": "user",
+      "konamiVerified": false,
+      "createdAt": "2026-07-25T08:18:02.370Z"
+    }
+  ],
+  "verifications": [],
+  "listings": [],
+  "newsItems": [],
+  "tournaments": [],
+  "chatMessages": []
+}

@@ -9,7 +9,7 @@ export default function ChatPage() {
   const [username, setUsername] = useState('guest');
 
   useEffect(() => {
-    const client = io(API_BASE_URL);
+    const client = io(API_BASE_URL, { transports: ['polling'] });
     setSocket(client);
 
     client.emit('join', 'global');

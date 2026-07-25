@@ -12,6 +12,11 @@ export function createApp() {
   app.use(cors());
   app.use(express.json());
 
+  app.get('/', (_req, res) => {
+    const frontendUrl = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
+    return res.redirect(frontendUrl);
+  });
+
   app.get('/health', (_req, res) => {
     res.json({ ok: true });
   });
